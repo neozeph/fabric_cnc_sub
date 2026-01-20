@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fabric-cnc"
+version = "1.0.0"
+description = "Fabric CNC machine control system for Raspberry Pi"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Peter Briggs", email = "peter@example.com"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Manufacturing",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Manufacturing",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "RPi.GPIO>=0.7.1",
+    "ezdxf>=1.0.0",  # Optional: for DXF file processing
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=22.0.0",
+    "flake8>=5.0.0",
+]
+
+[project.scripts]
+fabric-cnc = "main_app:main"
+
+[project.urls]
+Homepage = "https://github.com/pbriggin/fabric_cnc"
+Repository = "https://github.com/pbriggin/fabric_cnc.git"
+Issues = "https://github.com/pbriggin/fabric_cnc/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.setuptools.package-data]
+fabric_cnc = ["*.txt", "*.md"] 
