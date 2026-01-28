@@ -1571,14 +1571,14 @@ class FabricCNCApp:
                     folder_path = os.path.join(self.current_pattern_path, folder_name)
                     btn = ctk.CTkButton(
                         self.dxf_files_frame,
-                        text=f"📁 {folder_name}",
+                        text=f"{folder_name}",
                         command=lambda fp=folder_path: self._navigate_to_folder(fp),
                         fg_color="#6B7280",
                         hover_color="#4B5563",
                         text_color="#ffffff",
                         height=40,
                         corner_radius=4,
-                        font=("Arial", 11, "bold")
+                        font=("Arial", 14, "bold")
                     )
                     btn.pack(fill="x", padx=8, pady=6)
             
