@@ -691,26 +691,24 @@ class FabricCNCApp:
             "fg_color": UI_COLORS['PRIMARY_COLOR'],
             "hover_color": UI_COLORS['PRIMARY_VARIANT'],
             "text_color": UI_COLORS['ON_PRIMARY'],
-            "width": self.small_icon_size,
-            "height": self.small_icon_size,
-            "corner_radius": 6,
-            "font": ("Arial", self.base_font_size, "bold"),
+            "width": 18,
+            "height": 18,
+            "corner_radius": 4,
+            "font": ("Arial", 9, "bold"),
         }
         
         # Back (upper-left)
-        self.back_btn = ctk.CTkButton(toolbar_frame, text="← Back", command=self._navigate_up_folder, **icon_btn_style)
-        self.back_btn.configure(width=70)
+        self.back_btn = ctk.CTkButton(toolbar_frame, text="←", command=self._navigate_up_folder, **icon_btn_style)
+        self.back_btn.configure(width=22)
         self.back_btn.grid(row=0, column=0, sticky="w")
         
         # Actions (upper-right): Trash + Add Folder
         icon_frame = ctk.CTkFrame(toolbar_frame, fg_color="transparent")
         icon_frame.grid(row=0, column=2, sticky="e")
-        
         trash_btn = ctk.CTkButton(icon_frame, text="🗑", command=self._delete_selected_dxf, **icon_btn_style)
-        trash_btn.pack(side="right", padx=(4, 0))
-        
+        trash_btn.pack(side="right", padx=(1, 0))
         add_folder_btn = ctk.CTkButton(icon_frame, text="＋", command=self._add_new_pattern_folder, **icon_btn_style)
-        add_folder_btn.pack(side="right", padx=(4, 0))
+        add_folder_btn.pack(side="right", padx=(1, 0))
         
         # Create scrollable frame for file browser
         files_list_frame = ctk.CTkScrollableFrame(browser_box, fg_color="transparent", corner_radius=0)
