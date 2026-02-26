@@ -637,7 +637,7 @@ class FabricCNCApp:
             self.main_container.grid_rowconfigure(0, weight=1)
         
         # === LEFT COLUMN: Job Control ===
-        sidebar_max_height = int(self.root.winfo_screenheight() * 0.96)  # 96% of screen height
+        sidebar_max_height = int(self.root.winfo_screenheight() * 0.90)  # 90% of screen height to avoid cutoff
         self.left_column = ctk.CTkScrollableFrame(
             self.main_container,
             fg_color=UI_COLORS['SURFACE'],
