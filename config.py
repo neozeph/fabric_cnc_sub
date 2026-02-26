@@ -34,10 +34,10 @@ class Config:
         """Initialize configuration with all values directly in code."""
         # GPIO Pin Configuration
         self.gpio_pins = {
-            'X': {'DIR': 23, 'STEP': 24, 'EN': 9, 'HALL': 16},  # X hall sensor on pin 16
-            'Y': {'DIR': 27, 'STEP': 22, 'EN': 17, 'HALL': 1},  # Y motor hall sensor on pin 1
-            'Z_LIFT': {'DIR': 7, 'STEP': 18, 'EN': 8, 'HALL': 25},  # Z hall sensor on pin 25
-            'A': {'DIR': 19, 'STEP': 26, 'EN': 13, 'HALL': 12},  # A hall sensor on pin 12
+            'X': {'DIR': 1, 'STEP': 0, 'EN': 8},  # Pico GP0/1
+            'Y': {'DIR': 3, 'STEP': 2, 'EN': 8},  # Pico GP2/3
+            'Z_LIFT': {'DIR': 5, 'STEP': 4, 'EN': 8},  # Pico GP4/5
+            'A': {'DIR': 7, 'STEP': 6, 'EN': 8},  # Pico GP6/7
         }
         
         # Motor Steps Configuration (steps per inch)
@@ -157,10 +157,9 @@ MOTOR_CONFIG = {
         'PULSES_PER_REV': 800,  # DIP switches set for 800 steps per revolution
         'INCH_PER_REV': 0.787,  # 20mm per revolution = 0.787 inches per revolution
         'STEP_DELAY': 0.00025,  # 0.25ms between pulses = 2000 steps/sec
-        'STEP': 24,  # GPIO24 (Pin 18) - Motor 3 (X)
-        'DIR': 23,   # GPIO23 (Pin 16) - Motor 3 (X)
-        'EN': 9,     # GPIO9 (Pin 21) - Motor 3 (X)
-        'HALL': 16,  # GPIO16 (Pin 36) - Hall effect sensor pin
+        'STEP': 0,   # GP0
+        'DIR': 1,    # GP1
+        'EN': 8,     # GP8
         'HOME_DIRECTION': 1,  # Positive direction for homing
         'HOME_SPEED': 0.0005,  # Original homing speed (0.5ms between pulses)
         'VERIFY_SPEED': 0.002  # Original verification speed (2ms between pulses)
@@ -169,10 +168,9 @@ MOTOR_CONFIG = {
         'PULSES_PER_REV': 800,
         'INCH_PER_REV': 0.787,  # 20mm per revolution = 0.787 inches per revolution
         'STEP_DELAY': 0.00025,  # 0.25ms between pulses = 2000 steps/sec
-        'STEP': 22,  # GPIO22 (Pin 15) - Motor 2 (Y)
-        'DIR': 27,   # GPIO27 (Pin 13) - Motor 2 (Y)
-        'EN': 17,    # GPIO17 (Pin 11) - Motor 2 (Y)
-        'HALL': 1,   # GPIO1 (Pin 28) - Hall effect sensor pin (Y)
+        'STEP': 2,   # GP2
+        'DIR': 3,    # GP3
+        'EN': 8,     # GP8
         'HOME_DIRECTION': 1,
         'HOME_SPEED': 0.0005,  # Original homing speed
         'VERIFY_SPEED': 0.002  # Original verification speed
@@ -181,10 +179,9 @@ MOTOR_CONFIG = {
         'PULSES_PER_REV': 800,
         'INCH_PER_REV': 0.197,  # 5mm per revolution = 0.197 inches per revolution
         'STEP_DELAY': 0.00025,  # 0.25ms between pulses = 2000 steps/sec
-        'STEP': 18,  # GPIO18 (Pin 12) - Motor 4 (Z)
-        'DIR': 7,    # GPIO7 (Pin 26) - Motor 4 (Z)
-        'EN': 8,     # GPIO8 (Pin 24) - Motor 4 (Z)
-        'HALL': 25,  # GPIO25 (Pin 22) - Hall effect sensor pin
+        'STEP': 4,   # GP4
+        'DIR': 5,    # GP5
+        'EN': 8,     # GP8
         'HOME_DIRECTION': -1,
         'HOME_SPEED': 0.001,  # Original homing speed
         'VERIFY_SPEED': 0.004  # Original verification speed
@@ -193,10 +190,9 @@ MOTOR_CONFIG = {
         'PULSES_PER_REV': 3200,  # TB6600 driver setting (3200 pulses/rev)
         'INCH_PER_REV': 360,  # 360 degrees per revolution
         'STEP_DELAY': 0.00025,  # 0.25ms between pulses = 2000 steps/sec
-        'STEP': 26,  # GPIO26 (Pin 37) - Motor 5 (Rotation)
-        'DIR': 19,   # GPIO19 (Pin 35) - Motor 5 (Rotation)
-        'EN': 13,    # GPIO13 (Pin 33) - Motor 5 (Rotation)
-        'HALL': 12,  # GPIO12 (Pin 32) - Hall effect sensor pin
+        'STEP': 6,   # GP6
+        'DIR': 7,    # GP7
+        'EN': 8,     # GP8
         'HOME_DIRECTION': -1,
         'HOME_SPEED': 0.001,  # Original homing speed
         'VERIFY_SPEED': 0.004  # Original verification speed
