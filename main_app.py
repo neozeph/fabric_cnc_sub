@@ -887,7 +887,12 @@ class FabricCNCApp:
         """Open a new window with a fullscreen canvas."""
         fullscreen_window = ctk.CTkToplevel(self.root)
         fullscreen_window.title("Fullscreen Canvas")
-        fullscreen_window.attributes('-fullscreen', True)
+        # Always force fullscreen on RPi, normal fullscreen elsewhere
+        import config
+        if config.ON_RPI:
+            fullscreen_window.attributes('-fullscreen', True)
+        else:
+            fullscreen_window.attributes('-fullscreen', True)
         fullscreen_window.grab_set()
 
         # Canvas
@@ -2638,6 +2643,7 @@ class FabricCNCApp:
         # Position update loop will handle canvas redraw automatically
         # Clear status after 2 seconds
         self.root.after(2000, lambda: self.status_label.configure(text="Ready", text_color=UI_COLORS['ON_SURFACE']))
+        # Do NOT trigger fullscreen/expand here (fix for RPi)
     
     
 
