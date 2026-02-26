@@ -328,21 +328,9 @@ class RealMotorController:
         except Exception as e:
             logger.error(f"Cleanup error: {e}")
     
-    def check_limit_switches(self):
-        """Check the current status of limit switches."""
-        self.motor_controller.check_limit_switches()
-    
-    def get_grbl_settings(self):
-        """Query and display current GRBL settings."""
-        self.motor_controller.get_grbl_settings()
-    
     def get_grbl_info(self):
         """Get GRBL version and build info.""" 
         self.motor_controller.get_grbl_info()
-    
-    def test_limit_switch_connection(self):
-        """Test if limit switches are properly connected and readable."""
-        self.motor_controller.test_limit_switch_connection()
 
     def move_to(self, x=None, y=None, z=None, rot=None):
         # Get current position from GRBL for logging
@@ -384,7 +372,6 @@ class RealMotorController:
             # Convert inch distances to mm for GRBL
             x_mm = x_distance_in * 25.4
             y_mm = y_distance_in * 25.4
-            z_mm = z_distance_in * 25.4
             
             # Build G1 relative movement command
             cmd_parts = ["G91", "G1"]  # G91 = relative mode, G1 = linear interpolation
@@ -392,10 +379,6 @@ class RealMotorController:
                 cmd_parts.append(f"X{x_mm:.3f}")
             if abs(y_mm) > 1e-6:
                 cmd_parts.append(f"Y{y_mm:.3f}")
-            if abs(z_mm) > 1e-6:
-                cmd_parts.append(f"Z{z_mm:.3f}")
-            if abs(rot_distance_deg) > 1e-6:
-                cmd_parts.append(f"A{rot_distance_deg:.3f}")
             
             if len(cmd_parts) > 2:  # Only send if we have axes to move
                 cmd_parts.append("F1000")  # 1000 mm/min feedrate
@@ -842,41 +825,24 @@ class FabricCNCApp:
         motor_section.grid_rowconfigure(1, weight=1)  # Up arrow row
         motor_section.grid_rowconfigure(2, weight=1)  # Left/Right arrows row
         motor_section.grid_rowconfigure(3, weight=1)  # Down arrow row
-        motor_section.grid_rowconfigure(4, weight=1)  # Z controls row
-        motor_section.grid_rowconfigure(5, weight=1)  # A controls row
-        motor_section.grid_rowconfigure(6, weight=1)  # Jog size label row
-        motor_section.grid_rowconfigure(7, weight=1)  # Jog size slider row
-        motor_section.grid_rowconfigure(8, weight=1)  # Jog size value display row
-        motor_section.grid_rowconfigure(9, weight=1)  # Z limit label row
-        motor_section.grid_rowconfigure(10, weight=1)  # Z limit slider row
-        motor_section.grid_rowconfigure(11, weight=1)  # Z limit value display row
+        motor_section.grid_rowconfigure(4, weight=1)  # Jog size label row
+        motor_section.grid_rowconfigure(5, weight=1)  # Jog size slider row
+        motor_section.grid_rowconfigure(6, weight=1)  # Jog size value display row
         
         # Arrow buttons - stacked layout with equal widths and better spacing
         self._add_compact_jog_button(motor_section, "▲", lambda: self._jog('Y', +self.jog_size)).grid(row=1, column=0, columnspan=2, padx=8, pady=3, sticky="nsew")
         self._add_compact_jog_button(motor_section, "◀", lambda: self._jog('X', -self.jog_size)).grid(row=2, column=0, padx=8, pady=3, sticky="nsew")
         self._add_compact_jog_button(motor_section, "▶", lambda: self._jog('X', +self.jog_size)).grid(row=2, column=1, padx=8, pady=3, sticky="nsew")
         self._add_compact_jog_button(motor_section, "▼", lambda: self._jog('Y', -self.jog_size)).grid(row=3, column=0, columnspan=2, padx=8, pady=3, sticky="nsew")
-        # Z and A controls - compact
-        self._add_compact_jog_button(motor_section, "Z+", lambda: self._jog('Z', +self.jog_size)).grid(row=4, column=0, padx=8, pady=3, sticky="nsew")
-        self._add_compact_jog_button(motor_section, "Z-", lambda: self._jog('Z', -self.jog_size)).grid(row=4, column=1, padx=8, pady=3, sticky="nsew")
-        self._add_compact_jog_button(motor_section, "A+", lambda: self._jog('A', +self.jog_size)).grid(row=5, column=0, padx=8, pady=3, sticky="nsew")
-        self._add_compact_jog_button(motor_section, "A-", lambda: self._jog('A', -self.jog_size)).grid(row=5, column=1, padx=8, pady=3, sticky="nsew")
         
         # Jog size slider
-        ctk.CTkLabel(motor_section, text="Jog Size:", font=("Arial", 11, "bold"), text_color=UI_COLORS['PRIMARY_COLOR']).grid(row=6, column=0, columnspan=2, pady=(6, 2), padx=8)
+        ctk.CTkLabel(motor_section, text="Jog Size:", font=("Arial", 11, "bold"), text_color=UI_COLORS['PRIMARY_COLOR']).grid(row=4, column=0, columnspan=2, pady=(6, 2), padx=8)
         jog_slider = ctk.CTkSlider(motor_section, from_=1, to=100, number_of_steps=99, command=self._on_jog_slider, height=10)
-        jog_slider.grid(row=7, column=0, columnspan=2, padx=8, pady=2, sticky="ew")
+        jog_slider.grid(row=5, column=0, columnspan=2, padx=8, pady=2, sticky="ew")
         jog_slider.set(20)
         self.jog_size_label = ctk.CTkLabel(motor_section, text="1.00 in", font=("Arial", 10, "bold"), text_color=UI_COLORS['ON_SURFACE'])
-        self.jog_size_label.grid(row=8, column=0, columnspan=2, pady=2)
+        self.jog_size_label.grid(row=6, column=0, columnspan=2, pady=2)
         self._on_jog_slider(20)
-        ctk.CTkLabel(motor_section, text="Z Lower Limit:", font=("Arial", 11, "bold"), text_color=UI_COLORS['PRIMARY_COLOR']).grid(row=9, column=0, columnspan=2, pady=(6, 2), padx=8)
-        z_limit_slider = ctk.CTkSlider(motor_section, from_=2.0, to=3.0, number_of_steps=20, command=self._on_z_limit_slider, height=10)
-        z_limit_slider.grid(row=10, column=0, columnspan=2, padx=8, pady=2, sticky="ew")
-        z_limit_slider.set(2.0)
-        self.z_limit_label = ctk.CTkLabel(motor_section, text="-2.00 in", font=("Arial", 10, "bold"), text_color=UI_COLORS['ON_SURFACE'])
-        self.z_limit_label.grid(row=11, column=0, columnspan=2, pady=2)
-        self._on_z_limit_slider(2.0)
         
         # Home controls section
         home_section = ctk.CTkFrame(self.right_column, fg_color="#d0d0d0", corner_radius=8)
@@ -946,16 +912,6 @@ class FabricCNCApp:
         self.root.bind('<KeyRelease-Up>', lambda e: self._on_arrow_release('Up'))
         self.root.bind('<KeyPress-Down>', lambda e: self._on_arrow_press('Down'))
         self.root.bind('<KeyRelease-Down>', lambda e: self._on_arrow_release('Down'))
-        # Z axis controls
-        self.root.bind('<KeyPress-Prior>', lambda e: self._on_arrow_press('Page_Up'))  # Page Up for Z+
-        self.root.bind('<KeyRelease-Prior>', lambda e: self._on_arrow_release('Page_Up'))
-        self.root.bind('<KeyPress-Next>', lambda e: self._on_arrow_press('Page_Down'))  # Page Down for Z-
-        self.root.bind('<KeyRelease-Next>', lambda e: self._on_arrow_release('Page_Down'))
-        # Rotation controls
-        self.root.bind('<KeyPress-Home>', lambda e: self._on_arrow_press('Home'))  # Home key for A+
-        self.root.bind('<KeyRelease-Home>', lambda e: self._on_arrow_release('Home'))
-        self.root.bind('<KeyPress-End>', lambda e: self._on_arrow_press('End'))  # End key for A-
-        self.root.bind('<KeyRelease-End>', lambda e: self._on_arrow_release('End'))
         # Bind Escape key to stop movement
         self.root.bind('<KeyPress-Escape>', lambda e: self._stop_movement())
         # Bind F11 to toggle full screen
@@ -987,18 +943,6 @@ class FabricCNCApp:
         elif key == 'Down':
             axis = 'Y'
             delta = -self.jog_size
-        elif key == 'Page_Up':
-            axis = 'Z'
-            delta = self.jog_size
-        elif key == 'Page_Down':
-            axis = 'Z'
-            delta = -self.jog_size
-        elif key == 'Home':
-            axis = 'A'
-            delta = self.jog_size  # Use same as other axes
-        elif key == 'End':
-            axis = 'A'
-            delta = -self.jog_size  # Use same as other axes
         if axis:
             if not self._jog_in_progress.get(axis, False):
                 self._jog_in_progress[axis] = True
@@ -1023,10 +967,6 @@ class FabricCNCApp:
             self._jog_in_progress['X'] = False
         elif key in ['Up', 'Down']:
             self._jog_in_progress['Y'] = False
-        elif key in ['Page_Up', 'Page_Down']:
-            self._jog_in_progress['Z'] = False
-        elif key in ['Home', 'End']:
-            self._jog_in_progress['A'] = False
 
 
 
@@ -2660,7 +2600,7 @@ class FabricCNCApp:
         y_disp = pos['Y']
         z_disp = pos['Z']
         a_disp = pos['A']
-        text = f"X:{x_disp:.1f}in\nY:{y_disp:.1f}in\nZ:{z_disp:.1f}in\nA:{a_disp:.0f}°"
+        text = f"X:{x_disp:.1f}in\nY:{y_disp:.1f}in"
         self.coord_label.configure(text=text)
 
     def _update_jog_size(self):

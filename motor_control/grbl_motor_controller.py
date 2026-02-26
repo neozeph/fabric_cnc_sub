@@ -138,21 +138,155 @@ def get_grbl_controller_status():
     
     return status
 
+class MockGrblSerial:
+    """Simulates a GRBL controller over serial for testing without hardware."""
+    def __init__(self):
+        self.is_open = True
+        self.in_waiting = 0
+        self._tx_buffer = b""
+        self.position = [0.0, 0.0, 0.0, 0.0]  # X, Y, Z, A
+        self.target_position = [0.0, 0.0, 0.0, 0.0]
+        self.state = "Idle"
+        self.is_relative = False
+        self.running = True
+        self.sim_thread = threading.Thread(target=self._sim_loop, daemon=True)
+        self.sim_thread.start()
+        logger.info("Started Mock GRBL Serial Controller")
+
+    def write(self, data):
+        if not self.is_open: raise serial.SerialException("Port not open")
+        try:
+            cmd = data.decode('utf-8').strip()
+            if cmd:
+                self._handle_command(cmd)
+        except Exception as e:
+            logger.error(f"Mock write error: {e}")
+        return len(data)
+
+    def read(self, size=1):
+        if not self.is_open: raise serial.SerialException("Port not open")
+        data = b""
+        if self._tx_buffer:
+            count = min(size, len(self._tx_buffer))
+            data = self._tx_buffer[:count]
+            self._tx_buffer = self._tx_buffer[count:]
+            self.in_waiting = len(self._tx_buffer)
+        return data
+    
+    def flush(self):
+        pass
+        
+    def reset_input_buffer(self):
+        self._tx_buffer = b""
+        self.in_waiting = 0
+
+    def _handle_command(self, cmd):
+        if cmd == "?":
+            # Status report
+            mpos = ",".join(f"{p:.3f}" for p in self.position)
+            # Simple status response
+            status = f"<{self.state}|MPos:{mpos}|Bf:15,128|FS:0,0>\r\n"
+            self._respond(status)
+        elif cmd.startswith("$J="):
+            self.state = "Run"
+            is_rel = "G91" in cmd
+            
+            # Parse axes
+            for i, axis in enumerate(['X', 'Y', 'Z', 'A']):
+                match = re.search(f'[{axis}]([\\-\\d\\.]+)', cmd)
+                if match:
+                    val = float(match.group(1))
+                    if is_rel:
+                        self.target_position[i] += val
+                    else:
+                        self.target_position[i] = val
+            self._respond("ok\r\n")
+        elif "G0" in cmd or "G1" in cmd:
+             self.state = "Run"
+             if "G91" in cmd: self.is_relative = True
+             if "G90" in cmd: self.is_relative = False
+             
+             # Parse axes
+             for i, axis in enumerate(['X', 'Y', 'Z', 'A']):
+                match = re.search(f'[{axis}]([\\-\\d\\.]+)', cmd)
+                if match:
+                    val = float(match.group(1))
+                    if self.is_relative:
+                         self.target_position[i] += val
+                    else:
+                         self.target_position[i] = val
+             self._respond("ok\r\n")
+        elif cmd == "$H":
+            self.state = "Home"
+            # Reset positions
+            self.target_position = [0.0, 0.0, 0.0, 0.0]
+            # Position will update in loop
+            self._respond("ok\r\n")
+        elif cmd == "\x18": # Ctrl-X
+            self.state = "Alarm"
+            self._respond("Grbl 1.1h ['$' for help]\r\n")
+        elif cmd == "$X":
+            self.state = "Idle"
+            self._respond("ok\r\n")
+        else:
+            # Default ok for settings etc
+            self._respond("ok\r\n")
+
+    def _respond(self, response):
+        self._tx_buffer += response.encode('utf-8')
+        self.in_waiting = len(self._tx_buffer)
+
+    def _sim_loop(self):
+        last_time = time.time()
+        while self.running:
+            dt = time.time() - last_time
+            last_time = time.time()
+            
+            moving = False
+            # Simulate movement speed (units per second)
+            speed = 20.0 
+            
+            for i in range(4):
+                diff = self.target_position[i] - self.position[i]
+                if abs(diff) > 0.001:
+                    moving = True
+                    step = speed * dt
+                    if abs(diff) <= step:
+                        self.position[i] = self.target_position[i]
+                    else:
+                        self.position[i] += step if diff > 0 else -step
+            
+            if not moving and self.state == "Run":
+                self.state = "Idle"
+            elif moving and self.state == "Idle":
+                self.state = "Run"
+                
+            time.sleep(0.02)
+
+    def close(self):
+        self.running = False
+        self.is_open = False
+
 class GrblMotorController:
-    def __init__(self, port=None, baudrate=115200, debug_mode=False):
+    def __init__(self, port=None, baudrate=115200, debug_mode=False, simulation=False):
+        self.simulation = simulation
+        
         # Auto-detect GRBL controller if no port specified
-        if port is None:
+        if port is None and not self.simulation:
             logger.info("No port specified, attempting auto-detection of GRBL controller...")
             auto_port = find_best_grbl_port()
             if auto_port:
                 self.port = auto_port
                 logger.info(f"Auto-detected GRBL controller on {self.port}")
             else:
-                # Fallback to default port if auto-detection fails
-                self.port = '/dev/ttyACM1'
-                logger.warning(f"Auto-detection failed, falling back to default port: {self.port}")
+                # Fallback to simulation if auto-detection fails
+                logger.warning("Auto-detection failed. Switching to SIMULATION mode.")
+                self.simulation = True
+                self.port = "MOCK_PORT"
         else:
-            self.port = port
+            self.port = port if port else "MOCK_PORT"
+            if self.port == "MOCK_PORT":
+                self.simulation = True
             
         self.baudrate = baudrate
         self.serial = None
@@ -196,6 +330,11 @@ class GrblMotorController:
 
     def _open_serial_with_cleanup(self):
         """Open serial connection with device cleanup and retry logic."""
+        if self.simulation:
+            logger.info("Initializing Mock GRBL Serial for simulation")
+            self.serial = MockGrblSerial()
+            return
+
         max_retries = 3
         retry_delay = 1.0
         
@@ -633,12 +772,18 @@ class GrblMotorController:
         self.send(command)
 
     def home_all(self):
-        """Home all axes using $H command."""
-        logger.info("Starting home all axes sequence...")
-        self.send("$H")
+        """Home X and Y axes individually."""
+        logger.info("Starting X/Y homing sequence...")
+        
+        # Home X first
+        self.send("$HX")
+        time.sleep(5) # Wait for X homing
+        
+        # Home Y second
+        self.send("$HY")
         
         # Wait for homing to complete - this is critical timing
-        time.sleep(10)  # Extended wait for all axes homing and pushoff
+        time.sleep(5)  # Extended wait for all axes homing and pushoff
         
         # Wait for machine to stabilize and get final MACHINE position
         logger.info("Waiting for machine to stabilize after homing...")
