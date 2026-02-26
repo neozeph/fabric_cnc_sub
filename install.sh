@@ -137,22 +137,28 @@ install_fabric_cnc() {
 setup_launcher() {
     print_status "Setting up desktop launcher..."
     
-    # Make launcher script executable
-    chmod +x launch_motor_test.sh
+    if [ -f "launch_motor_test.sh" ]; then
+        # Make launcher script executable
+        chmod +x launch_motor_test.sh
+    fi
     
-    # Copy minimal desktop file to applications
-    cp fabric-cnc-motor-test.desktop ~/.local/share/applications/
-    chmod +x ~/.local/share/applications/fabric-cnc-motor-test.desktop
-    
-    # Also copy to desktop for easy access
-    cp fabric-cnc-motor-test.desktop ~/Desktop/
-    chmod +x ~/Desktop/fabric-cnc-motor-test.desktop
-    
-    # Convert to Unix line endings (robustness)
-    if command -v dos2unix >/dev/null 2>&1; then
-        dos2unix fabric-cnc-motor-test.desktop
-        dos2unix ~/fabric_cnc/fabric-cnc-motor-test.desktop
-        dos2unix ~/Desktop/fabric-cnc-motor-test.desktop
+    if [ -f "fabric-cnc-motor-test.desktop" ]; then
+        # Copy minimal desktop file to applications
+        mkdir -p ~/.local/share/applications/
+        cp fabric-cnc-motor-test.desktop ~/.local/share/applications/
+        chmod +x ~/.local/share/applications/fabric-cnc-motor-test.desktop
+        
+        # Also copy to desktop for easy access
+        mkdir -p ~/Desktop/
+        cp fabric-cnc-motor-test.desktop ~/Desktop/
+        chmod +x ~/Desktop/fabric-cnc-motor-test.desktop
+        
+        # Convert to Unix line endings (robustness)
+        if command -v dos2unix >/dev/null 2>&1; then
+            dos2unix fabric-cnc-motor-test.desktop
+            [ -f ~/fabric_cnc/fabric-cnc-motor-test.desktop ] && dos2unix ~/fabric_cnc/fabric-cnc-motor-test.desktop
+            dos2unix ~/Desktop/fabric-cnc-motor-test.desktop
+        fi
     fi
     
     print_success "Desktop launcher configured"
@@ -251,7 +257,7 @@ main() {
     fi
 
     # Run the main app
-    python3 main_app.py
+    ./venv/bin/python main_app.py
 }
 
 # Run main function
