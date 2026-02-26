@@ -35,8 +35,7 @@ class Config:
         # GPIO Pin Configuration
         self.gpio_pins = {
             'X': {'DIR': 23, 'STEP': 24, 'EN': 9, 'HALL': 16},  # X hall sensor on pin 16
-            'Y1': {'DIR': 27, 'STEP': 22, 'EN': 17, 'HALL': 1},  # Left Y motor hall sensor on pin 1
-            'Y2': {'DIR': 5, 'STEP': 6, 'EN': 10, 'HALL': 20},  # Right Y motor hall sensor on pin 20
+            'Y': {'DIR': 27, 'STEP': 22, 'EN': 17, 'HALL': 1},  # Y motor hall sensor on pin 1
             'Z_LIFT': {'DIR': 7, 'STEP': 18, 'EN': 8, 'HALL': 25},  # Z hall sensor on pin 25
             'A': {'DIR': 19, 'STEP': 26, 'EN': 13, 'HALL': 12},  # A hall sensor on pin 12
         }
@@ -44,8 +43,7 @@ class Config:
         # Motor Steps Configuration (steps per inch)
         self.steps_per_inch = {
             'X': 2032,  # 80 steps/mm * 25.4 mm/inch
-            'Y1': 2032,  # 80 steps/mm * 25.4 mm/inch
-            'Y2': 2032,  # 80 steps/mm * 25.4 mm/inch
+            'Y': 2032,  # 80 steps/mm * 25.4 mm/inch
             'Z_LIFT': 10160,  # 400 steps/mm * 25.4 mm/inch
             'A': 254,  # 10 steps/mm * 25.4 mm/inch
         }
@@ -53,8 +51,7 @@ class Config:
         # Motor Direction Configuration
         self.direction_inverted = {
             'X': True,  # Invert X direction to fix flipped axis
-            'Y1': True,  # Invert Y1 to fix Y direction
-            'Y2': False,  # Keep Y2 normal (opposite of Y1 for sync)
+            'Y': True,  # Invert Y direction
             'Z_LIFT': False,
             'A': True,  # Invert direction to fix one-way rotation issue
         }
@@ -78,8 +75,7 @@ class Config:
         # Sensor debounce configuration (in milliseconds)
         self.sensor_debounce_times = {
             'X': 15,      # 15ms for X sensor
-            'Y1': 10,     # 10ms for Y1 sensor
-            'Y2': 10,     # 10ms for Y2 sensor
+            'Y': 10,      # 10ms for Y sensor
             'Z_LIFT': 40, # 40ms for Z sensor
             'A': 25 # 25ms for A sensor
         }
@@ -169,26 +165,14 @@ MOTOR_CONFIG = {
         'HOME_SPEED': 0.0005,  # Original homing speed (0.5ms between pulses)
         'VERIFY_SPEED': 0.002  # Original verification speed (2ms between pulses)
     },
-    'Y1': {
+    'Y': {
         'PULSES_PER_REV': 800,
         'INCH_PER_REV': 0.787,  # 20mm per revolution = 0.787 inches per revolution
         'STEP_DELAY': 0.00025,  # 0.25ms between pulses = 2000 steps/sec
-        'STEP': 22,  # GPIO22 (Pin 15) - Motor 2 (Left Y)
-        'DIR': 27,   # GPIO27 (Pin 13) - Motor 2 (Left Y)
-        'EN': 17,    # GPIO17 (Pin 11) - Motor 2 (Left Y)
-        'HALL': 1,   # GPIO1 (Pin 28) - Hall effect sensor pin (Left Y)
-        'HOME_DIRECTION': 1,
-        'HOME_SPEED': 0.0005,  # Original homing speed
-        'VERIFY_SPEED': 0.002  # Original verification speed
-    },
-    'Y2': {
-        'PULSES_PER_REV': 800,
-        'INCH_PER_REV': 0.787,  # 20mm per revolution = 0.787 inches per revolution
-        'STEP_DELAY': 0.00025,  # 0.25ms between pulses = 2000 steps/sec
-        'STEP': 6,   # GPIO6 (Pin 31) - Motor 1 (Right Y)
-        'DIR': 5,    # GPIO5 (Pin 29) - Motor 1 (Right Y)
-        'EN': 10,    # GPIO10 (Pin 19) - Motor 1 (Right Y)
-        'HALL': 20,  # GPIO20 (Pin 38) - Hall effect sensor pin (Right Y)
+        'STEP': 22,  # GPIO22 (Pin 15) - Motor 2 (Y)
+        'DIR': 27,   # GPIO27 (Pin 13) - Motor 2 (Y)
+        'EN': 17,    # GPIO17 (Pin 11) - Motor 2 (Y)
+        'HALL': 1,   # GPIO1 (Pin 28) - Hall effect sensor pin (Y)
         'HOME_DIRECTION': 1,
         'HOME_SPEED': 0.0005,  # Original homing speed
         'VERIFY_SPEED': 0.002  # Original verification speed
