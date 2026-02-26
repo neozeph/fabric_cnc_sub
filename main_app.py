@@ -2450,12 +2450,22 @@ class FabricCNCApp:
 
     def _add_jog_button(self, parent, text, cmd):
         # Consistent font with rest of project
-        btn = ctk.CTkButton(parent, text=text, command=cmd, width=50, height=self.button_height, fg_color=UI_COLORS['BUTTON_PRIMARY'], text_color=UI_COLORS['BUTTON_TEXT'], hover_color=UI_COLORS['BUTTON_PRIMARY_HOVER'], corner_radius=8, font=("Arial", self.base_font_size, "bold"))
+        def logged_cmd():
+            print(f"Button clicked: {text}")
+            if cmd:
+                cmd()
+        
+        btn = ctk.CTkButton(parent, text=text, command=logged_cmd, width=50, height=self.button_height, fg_color=UI_COLORS['BUTTON_PRIMARY'], text_color=UI_COLORS['BUTTON_TEXT'], hover_color=UI_COLORS['BUTTON_PRIMARY_HOVER'], corner_radius=8, font=("Arial", self.base_font_size, "bold"))
         return btn
 
     def _add_compact_jog_button(self, parent, text, cmd):
         # Compact version with consistent font styling
-        btn = ctk.CTkButton(parent, text=text, command=cmd, width=60, height=self.button_height, fg_color=UI_COLORS['BUTTON_PRIMARY'], text_color=UI_COLORS['BUTTON_TEXT'], hover_color=UI_COLORS['BUTTON_PRIMARY_HOVER'], corner_radius=8, font=("Arial", self.jog_btn_font_size, "bold"))
+        def logged_cmd():
+            print(f"Button clicked: {text}")
+            if cmd:
+                cmd()
+        
+        btn = ctk.CTkButton(parent, text=text, command=logged_cmd, width=60, height=self.button_height, fg_color=UI_COLORS['BUTTON_PRIMARY'], text_color=UI_COLORS['BUTTON_TEXT'], hover_color=UI_COLORS['BUTTON_PRIMARY_HOVER'], corner_radius=8, font=("Arial", self.jog_btn_font_size, "bold"))
         return btn
 
     def _create_stylish_button(self, parent, text, command, button_type="primary", **kwargs):
@@ -2485,7 +2495,12 @@ class FabricCNCApp:
         # Update with any custom kwargs
         default_kwargs.update(kwargs)
         
-        btn = ctk.CTkButton(parent, text=text, command=command, **default_kwargs)
+        def logged_command():
+            print(f"Button clicked: {text.strip()}")
+            if command:
+                command()
+        
+        btn = ctk.CTkButton(parent, text=text, command=logged_command, **default_kwargs)
         return btn
 
     def _jog(self, axis, delta):
