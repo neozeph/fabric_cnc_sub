@@ -598,6 +598,8 @@ class GrblMotorController:
             "error:35": "A G2 or G3 arc, traced with the offset definition, is missing the IJK offset word in the selected plane to trace the arc.",
             "error:36": "There are unused, leftover G-code words that aren't used by any command in the block.",
             "error:37": "The G43.1 dynamic tool length offset command cannot apply an offset to an axis other than its configured axis. The Grbl default axis is the Z-axis.",
+            "error:52": "Tool number > 255 or < 0 (grblHAL)",
+            "error:53": "Analogue input > 7 or < 0 (grblHAL)",
             "error:79": "Homing not enabled in settings, or emergency stop/limit switch triggered during unlock attempt."
         }
         

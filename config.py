@@ -134,11 +134,17 @@ WORKAREA_INCH = {'X': config.work_area.x, 'Y': config.work_area.y}
 DEFAULT_SPEED_INCH_S = config.motion.default_speed_inch_s
 DEFAULT_ACCEL_INCH_S2 = config.motion.default_accel_inch_s2
 LIFT_HEIGHT_INCH = config.motion.lift_height_inch
-USE_SIMULATION_MODE = config.simulation_mode
 STEP_PULSE_DURATION = config.step_pulse_duration
 
 # Simulation mode detection
-SIMULATION_MODE = not ON_RPI or config.simulation_mode
+# Let environment variable override the platform detection.
+# If FABRIC_CNC_SIMULATION is set, it dictates the mode.
+# Otherwise, default to simulation on non-RPi platforms.
+_sim_env = os.getenv('FABRIC_CNC_SIMULATION')
+if _sim_env is not None:
+    SIMULATION_MODE = _sim_env.lower() in ('true', '1', 'yes')
+else:
+    SIMULATION_MODE = not ON_RPI
 
 # Motor configuration - All motor parameters consolidated here
 MOTOR_CONFIG = {

@@ -22,7 +22,8 @@ def lazy_import_motor_control():
     try:
         from motor_control.grbl_motor_controller import GrblMotorController
         return GrblMotorController, True
-    except ImportError:
+    except ImportError as e:
+        print(f"Failed to import GrblMotorController: {e}")
         return None, False
 
 def lazy_import_dxf_processing():
