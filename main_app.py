@@ -849,7 +849,7 @@ class FabricCNCApp:
         home_section.pack(fill="x", padx=6, pady=(6, 4), anchor="n")
         
         home_buttons = [
-            ("Home All", self._home_all, "success")
+            ("Home All", self._home_all, "success"),
             ("Set Zero (Home)", self._home_all, "success")
         ]
         
