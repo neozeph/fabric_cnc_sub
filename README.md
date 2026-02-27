@@ -1,10 +1,10 @@
 # Fabric CNC - Raspberry Pi Control System
 
-A complete CNC fabric cutting machine control system designed specifically for Raspberry Pi 4. This system provides motor control, DXF file processing, toolpath generation, and a comprehensive GUI for machine operation.
+A complete CNC fabric cutting machine control system designed for Raspberry Pi 4 using a **Raspberry Pi Pico** as the real-time motor controller. This system provides motor control, DXF file processing, toolpath generation, and a comprehensive GUI for machine operation.
 
 ## Features
 
-- **Motor Control**: Full control of X, Y, Z, and rotation axes with stepper motors
+ - **Motor Control**: GRBL-based control via Raspberry Pi Pico for smooth, real-time stepping
 - **Homing System**: EMI-resistant hall effect sensor homing with verification
 - **DXF Processing**: Import and process DXF files for cutting patterns
 - **Toolpath Generation**: Automatic toolpath generation from DXF entities
@@ -14,37 +14,19 @@ A complete CNC fabric cutting machine control system designed specifically for R
 
 ## Hardware Requirements
 
-- **Raspberry Pi 4** (recommended) or Raspberry Pi 3B+
+- **Raspberry Pi 4** (recommended) or Raspberry Pi 3B+ (Host)
+- **Raspberry Pi Pico** (Motor Controller)
 - **Stepper Motors**: 5 stepper motors (X, Y1, Y2, Z_LIFT, A)
 - **Motor Drivers**: TB6600 or similar stepper motor drivers
 - **Hall Effect Sensors**: NJK-5002C for homing (5 sensors)
-- **Power Supply**: 5V for logic, 12-24V for motors
+- **Power Supply**: 5V for logic (Raspberry Pi), 24V 5A+ for motors
 - **GPIO Connections**: See pinout below
 
-## GPIO Pin Configuration
+## Firmware Setup (Raspberry Pi Pico)
 
-| Component | Pin | Function |
-|-----------|-----|----------|
-| X Motor | GPIO 5 | STEP |
-| X Motor | GPIO 6 | DIR |
-| X Motor | GPIO 13 | ENABLE |
-| X Motor | GPIO 20 | HALL Sensor |
-| Y1 Motor | GPIO 10 | STEP |
-| Y1 Motor | GPIO 9 | DIR |
-| Y1 Motor | GPIO 11 | ENABLE |
-| Y1 Motor | GPIO 21 | HALL Sensor |
-| Y2 Motor | GPIO 17 | STEP |
-| Y2 Motor | GPIO 27 | DIR |
-| Y2 Motor | GPIO 22 | ENABLE |
-| Y2 Motor | GPIO 16 | HALL Sensor |
-| Z_LIFT | GPIO 12 | STEP |
-| Z_LIFT | GPIO 11 | DIR |
-| Z_LIFT | GPIO 13 | ENABLE |
-| Z_LIFT | GPIO 22 | HALL Sensor |
-| A | GPIO 15 | STEP |
-| A | GPIO 14 | DIR |
-| A | GPIO 16 | ENABLE |
-| A | GPIO 23 | HALL Sensor |
+This project requires a Raspberry Pi Pico running **grblHAL** firmware to handle motor timing.
+
+👉 **[Read the Pico Setup Guide](PICO_SETUP.md)** for instructions on flashing and configuring the Pico.
 
 ## Quick Installation
 

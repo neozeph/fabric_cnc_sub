@@ -850,6 +850,7 @@ class FabricCNCApp:
         
         home_buttons = [
             ("Home All", self._home_all, "success")
+            ("Set Zero (Home)", self._home_all, "success")
         ]
         
         for i, (text, command, button_type) in enumerate(home_buttons):
@@ -967,6 +968,10 @@ class FabricCNCApp:
             self._jog_in_progress['X'] = False
         elif key in ['Up', 'Down']:
             self._jog_in_progress['Y'] = False
+        elif key in ['Page_Up', 'Page_Down']:
+            self._jog_in_progress['Z'] = False
+        elif key in ['Home', 'End']:
+            self._jog_in_progress['A'] = False
 
 
 
@@ -2456,6 +2461,7 @@ class FabricCNCApp:
                 cmd()
         
         btn = ctk.CTkButton(parent, text=text, command=logged_cmd, width=50, height=self.button_height, fg_color=UI_COLORS['BUTTON_PRIMARY'], text_color=UI_COLORS['BUTTON_TEXT'], hover_color=UI_COLORS['BUTTON_PRIMARY_HOVER'], corner_radius=8, font=("Arial", self.base_font_size, "bold"))
+        btn = ctk.CTkButton(parent, text=text, command=logged_cmd, width=50, height=40, fg_color=UI_COLORS['BUTTON_PRIMARY'], text_color=UI_COLORS['BUTTON_TEXT'], hover_color=UI_COLORS['BUTTON_PRIMARY_HOVER'], corner_radius=8, font=("Arial", 16, "bold"))
         return btn
 
     def _add_compact_jog_button(self, parent, text, cmd):
@@ -2466,6 +2472,7 @@ class FabricCNCApp:
                 cmd()
         
         btn = ctk.CTkButton(parent, text=text, command=logged_cmd, width=60, height=self.button_height, fg_color=UI_COLORS['BUTTON_PRIMARY'], text_color=UI_COLORS['BUTTON_TEXT'], hover_color=UI_COLORS['BUTTON_PRIMARY_HOVER'], corner_radius=8, font=("Arial", self.jog_btn_font_size, "bold"))
+        btn = ctk.CTkButton(parent, text=text, command=logged_cmd, width=60, height=45, fg_color=UI_COLORS['BUTTON_PRIMARY'], text_color=UI_COLORS['BUTTON_TEXT'], hover_color=UI_COLORS['BUTTON_PRIMARY_HOVER'], corner_radius=8, font=("Arial", 16, "bold"))
         return btn
 
     def _create_stylish_button(self, parent, text, command, button_type="primary", **kwargs):
@@ -2525,6 +2532,8 @@ class FabricCNCApp:
         new_pos = current_pos[pos_axis] + delta
         
         # Bounds checking
+        # Bounds checking removed to allow manual positioning (negative coordinates)
+        # The motor controller has its own safety limits (clamping to max travel)
         if axis == 'X':
             if new_pos < 0:
                 logger.warning(f"X jog blocked: would move to {new_pos:.3f} (min: 0)")

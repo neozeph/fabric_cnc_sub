@@ -34,10 +34,10 @@ class Config:
         """Initialize configuration with all values directly in code."""
         # GPIO Pin Configuration
         self.gpio_pins = {
-            'X': {'DIR': 1, 'STEP': 0, 'EN': 8},  # Pico GP0/1
-            'Y': {'DIR': 3, 'STEP': 2, 'EN': 8},  # Pico GP2/3
-            'Z_LIFT': {'DIR': 5, 'STEP': 4, 'EN': 8},  # Pico GP4/5
-            'A': {'DIR': 7, 'STEP': 6, 'EN': 8},  # Pico GP6/7
+            'X': {'DIR': 3, 'STEP': 2, 'EN': 1},  # Pico GP2/3 (Standard Generic 4-axis)
+            'Y': {'DIR': 5, 'STEP': 4, 'EN': 1},  # Pico GP4/5
+            'Z_LIFT': {'DIR': 7, 'STEP': 6, 'EN': 1},  # Pico GP6/7
+            'A': {'DIR': 9, 'STEP': 8, 'EN': 1},  # Pico GP8/9
         }
         
         # Motor Steps Configuration (steps per inch)
@@ -71,17 +71,6 @@ class Config:
         self.step_pulse_duration = float(
             os.getenv('FABRIC_CNC_STEP_PULSE_DURATION', '0.001')
         )
-        
-        # Sensor debounce configuration (in milliseconds)
-        self.sensor_debounce_times = {
-            'X': 15,      # 15ms for X sensor
-            'Y': 10,      # 10ms for Y sensor
-            'Z_LIFT': 40, # 40ms for Z sensor
-            'A': 25 # 25ms for A sensor
-        }
-        
-        # Sensor reading count for multi-reading debounce
-        self.sensor_reading_count = 2
         
         self._validate_config()
         
@@ -157,9 +146,9 @@ MOTOR_CONFIG = {
         'PULSES_PER_REV': 800,  # DIP switches set for 800 steps per revolution
         'INCH_PER_REV': 0.787,  # 20mm per revolution = 0.787 inches per revolution
         'STEP_DELAY': 0.00025,  # 0.25ms between pulses = 2000 steps/sec
-        'STEP': 0,   # GP0
-        'DIR': 1,    # GP1
-        'EN': 8,     # GP8
+        'STEP': 2,   # GP2
+        'DIR': 3,    # GP3
+        'EN': 1,     # GP1
         'HOME_DIRECTION': 1,  # Positive direction for homing
         'HOME_SPEED': 0.0005,  # Original homing speed (0.5ms between pulses)
         'VERIFY_SPEED': 0.002  # Original verification speed (2ms between pulses)
@@ -168,9 +157,9 @@ MOTOR_CONFIG = {
         'PULSES_PER_REV': 800,
         'INCH_PER_REV': 0.787,  # 20mm per revolution = 0.787 inches per revolution
         'STEP_DELAY': 0.00025,  # 0.25ms between pulses = 2000 steps/sec
-        'STEP': 2,   # GP2
-        'DIR': 3,    # GP3
-        'EN': 8,     # GP8
+        'STEP': 4,   # GP4
+        'DIR': 5,    # GP5
+        'EN': 1,     # GP1
         'HOME_DIRECTION': 1,
         'HOME_SPEED': 0.0005,  # Original homing speed
         'VERIFY_SPEED': 0.002  # Original verification speed
@@ -179,9 +168,9 @@ MOTOR_CONFIG = {
         'PULSES_PER_REV': 800,
         'INCH_PER_REV': 0.197,  # 5mm per revolution = 0.197 inches per revolution
         'STEP_DELAY': 0.00025,  # 0.25ms between pulses = 2000 steps/sec
-        'STEP': 4,   # GP4
-        'DIR': 5,    # GP5
-        'EN': 8,     # GP8
+        'STEP': 6,   # GP6
+        'DIR': 7,    # GP7
+        'EN': 1,     # GP1
         'HOME_DIRECTION': -1,
         'HOME_SPEED': 0.001,  # Original homing speed
         'VERIFY_SPEED': 0.004  # Original verification speed
@@ -190,9 +179,9 @@ MOTOR_CONFIG = {
         'PULSES_PER_REV': 3200,  # TB6600 driver setting (3200 pulses/rev)
         'INCH_PER_REV': 360,  # 360 degrees per revolution
         'STEP_DELAY': 0.00025,  # 0.25ms between pulses = 2000 steps/sec
-        'STEP': 6,   # GP6
-        'DIR': 7,    # GP7
-        'EN': 8,     # GP8
+        'STEP': 8,   # GP8
+        'DIR': 9,    # GP9
+        'EN': 1,     # GP1
         'HOME_DIRECTION': -1,
         'HOME_SPEED': 0.001,  # Original homing speed
         'VERIFY_SPEED': 0.004  # Original verification speed
@@ -204,7 +193,8 @@ MACHINE_CONFIG = {
     'MAX_X': 30,  # Maximum X travel in inches (matches work area)
     'MAX_Y': 30,  # Maximum Y travel in inches (matches work area)
     'HOMING_OFFSET': 0.225,  # Distance to move after hitting home sensor (5.715mm = 0.225 inches)
-    'VERIFICATION_DISTANCE': 0.394  # Distance to move for verification (10mm = 0.394 inches)
+    'VERIFICATION_DISTANCE': 0.394,  # Distance to move for verification (10mm = 0.394 inches)
+    'HOMING_ENABLED': False,  # Set to False to disable homing requirement (manual test mode)
 }
 
 

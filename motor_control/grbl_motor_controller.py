@@ -468,7 +468,7 @@ class GrblMotorController:
                 "$19": "0",       # Laser mode
                 "$20": "0",       # Soft limits
                 "$21": "0",       # Hard limits disable (prevent A-axis limit issues)
-                "$22": "1",       # Homing cycle enable
+                "$22": "1" if MACHINE_CONFIG.get('HOMING_ENABLED', True) else "0",       # Homing cycle enable
                 "$23": "3",       # Homing direction mask (X=1, Y=1, Z=0, A=0 - X&Y home positive, Z&A home negative)
                 "$24": "500.0",   # Homing seek rate (swapped - this implementation uses for first approach)
                 "$25": "1500.0",  # Homing feed rate (swapped - this implementation uses for second approach)
@@ -773,6 +773,14 @@ class GrblMotorController:
 
     def home_all(self):
         """Home X and Y axes individually."""
+        if not MACHINE_CONFIG.get('HOMING_ENABLED', True):
+            logger.info("Homing disabled in config. Setting current position as home (0,0,0,0).")
+            self.send("G10 P1 L20 X0 Y0 Z0 A0")  # Set work coordinates to 0
+            self.send("G54")
+            with self.status_lock:
+                self.is_homed = True
+            return
+
         logger.info("Starting X/Y homing sequence...")
         
         # Home X first
