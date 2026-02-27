@@ -2531,6 +2531,30 @@ class FabricCNCApp:
             
         new_pos = current_pos[pos_axis] + delta
         
+                # Bounds checking
+        if axis == 'X':
+            if new_pos < 0:
+                logger.warning(f"X jog blocked: would move to {new_pos:.3f} (min: 0)")
+                return
+            elif new_pos > config.APP_CONFIG['X_MAX_INCH']:
+                logger.warning(f"X jog blocked: would move to {new_pos:.3f} (max: {config.APP_CONFIG['X_MAX_INCH']})")
+                return
+        elif axis == 'Y':
+            if new_pos < 0:
+                logger.warning(f"Y jog blocked: would move to {new_pos:.3f} (min: 0)")
+                return
+            elif new_pos > config.APP_CONFIG['Y_MAX_INCH']:
+                logger.warning(f"Y jog blocked: would move to {new_pos:.3f} (max: {config.APP_CONFIG['Y_MAX_INCH']})")
+                return
+        elif axis == 'Z':
+            if new_pos > 0:
+                logger.warning(f"Z jog blocked: would move to {new_pos:.3f} (max: 0)")
+                return
+        elif axis == 'A':
+            # Allow continuous rotation - remove bounds checking for A-axis
+            pass
+        # Bounds checking removed to allow manual positioning
+        # The motor controller has its own safety limits (clamping to max travel) if configured
         # Bounds checking
         # Bounds checking removed to allow manual positioning (negative coordinates)
         # The motor controller has its own safety limits (clamping to max travel)

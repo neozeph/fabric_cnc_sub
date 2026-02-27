@@ -521,26 +521,26 @@ class GrblMotorController:
                 "$133": "200.000",    # A max travel
                 
                 # Additional grblHAL settings
-                "$341": "0",       # Tool change mode
-                "$342": "30.0",    # Tool change probing distance
-                "$343": "25.0",    # Tool change locate feed rate
-                "$344": "200.0",   # Tool change search seek rate
-                "$345": "200.0",   # Tool change probe pull-off rate
-                "$346": "1",       # Restore position after M6
-                "$370": "0",       # Invert I/O Port inputs
-                "$376": "0",       # Invert I/O Port outputs
-                "$384": "0",       # Disable G92 persistence
-                "$394": "0.0",     # I/O Port analog input deadband
-                "$398": "100",     # Planner buffer blocks
-                "$481": "0",       # Autoreporting interval
-                "$485": "0",       # Multi-axis step pulse delay
-                "$486": "0",       # Step pulse delay
-                "$538": "0",       # Encoders enabled
-                "$539": "0.0",     # Encoder step rate
-                "$650": "0",       # WebUI heap size
-                "$673": "0.0",     # Tool change probing overrides
-                "$676": "3",       # WiFi mode
-                "$680": "0"        # Modbus enable
+                # "$341": "0",       # Tool change mode
+                # "$342": "30.0",    # Tool change probing distance
+                # "$343": "25.0",    # Tool change locate feed rate
+                # "$344": "200.0",   # Tool change search seek rate
+                # "$345": "200.0",   # Tool change probe pull-off rate
+                # "$346": "1",       # Restore position after M6
+                # "$370": "0",       # Invert I/O Port inputs
+                # "$376": "0",       # Invert I/O Port outputs
+                # "$384": "0",       # Disable G92 persistence
+                # "$394": "0.0",     # I/O Port analog input deadband
+                # "$398": "100",     # Planner buffer blocks
+                # "$481": "0",       # Autoreporting interval
+                # "$485": "0",       # Multi-axis step pulse delay
+                # "$486": "0",       # Step pulse delay
+                # "$538": "0",       # Encoders enabled
+                # "$539": "0.0",     # Encoder step rate
+                # "$650": "0",       # WebUI heap size
+                # "$673": "0.0",     # Tool change probing overrides
+                # "$676": "3",       # WiFi mode
+                # "$680": "0"        # Modbus enable
             }
             
             # Log the homing offset being used
@@ -970,6 +970,14 @@ class GrblMotorController:
         """Robust alarm clearing sequence for startup."""
         try:
             # Comprehensive alarm clearing sequence
+            
+            # Force disable limits and homing immediately to allow unlock
+            # This handles cases where firmware defaults prevent unlocking due to floating pins
+            logger.info("Forcing safety settings to allow unlock...")
+            self.send_immediate("$20=0") # Disable soft limits
+            self.send_immediate("$21=0") # Disable hard limits
+            self.send_immediate("$22=0") # Disable homing cycle
+            time.sleep(0.5)
             
             # Method 1: Try simple unlock first
             self.send("$X")
